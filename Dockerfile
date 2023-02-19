@@ -2,7 +2,7 @@
 # FROM ubuntu:20.04 as amd64
 # FROM arm64v8/ubuntu:20.04
 
-FROM --platform=linux/amd64 ubuntu:18.04
+FROM --platform=linux/amd64 hieuphq/sol:latest
 
 # RPC JSON
 EXPOSE 8899/tcp
@@ -36,41 +36,27 @@ EXPOSE 8007/udp
 # broadcast
 EXPOSE 8008/udp
 
-# these run at `build` time
+ARG ANCHOR_VERSION=0.26.0
+# Install anchor-cli
+RUN . ~/.cargo/env && echo $PATH && \
+    cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+RUN . ~/.cargo/env && echo $PATH && avm install ${ANCHOR_VERSION} && avm use ${ANCHOR_VERSION}
+# avm use ${ANCHOR_VERSION}
 
-RUN apt update
-RUN apt-get install -y bzip2 \
-    libssl-dev libudev-dev clang \
-    vim wget curl gcc pkg-config
 
-ARG SOLANA_VERSION=1.9.9
+# ARG ANCHOR_VERSION=0.26.0
+# RUN . ~/.cargo/env && echo $PATH && \
+#     cargo install --git https://github.com/coral-xyz/anchor --tag v${ANCHOR_VERSION} anchor-cli --locked
 
-RUN wget -O /opt/solana-${SOLANA_VERSION}.tar.gz https://github.com/solana-labs/solana/archive/refs/tags/v${SOLANA_VERSION}.tar.gz
-# COPY solana-1.7.12.tar.gz /opt/solana-1.7.12.tar.gz
 
-# rustup: installs cargo, clippy rust-docs, rust-std, rustc, rustfmt
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+# RUN git clone --branch v${ANCHOR_VERSION} https://github.com/project-serum/anchor.git && \
+#     cd anchor/cli && \
+#     cargo install --path . --locked --force --features="no-self-update"
 
-# RUN source $HOME/.cargo/env && echo $PATH
-RUN . ~/.cargo/env && echo $PATH
-# RUN export PATH=~/.cargo/bin:$PATH 
-ENV PATH=~/.cargo/bin:$PATH
+# ENV PATH=/opt/anchor/target/release:/opt/solana-${SOLANA_VERSION}/bin:$PATH
 
-RUN cd /opt; tar -xvf solana-${SOLANA_VERSION}.tar.gz
-RUN cd /opt/solana-${SOLANA_VERSION}; ./scripts/cargo-install-all.sh .
-
-ENV PATH=/opt/solana-${SOLANA_VERSION}/bin:$PATH
-
-# # Create a .profile
-# RUN echo 'PATH=$PATH:$PATH:~/.cargo/bin:/opt/solana-1.7.12/bin' >> ~/.profile
-# # Create a .bash_profile
-# RUN echo 'PATH=$PATH:/$PATH:~/.cargo/bin:/opt/solana-1.7.12/bin' >> ~/.bash_profile
-
-# Update bashrc
-RUN echo 'PATH=$PATH:/$PATH:/opt/solana-${SOLANA_VERSION}/bin' >> ~/.bashrc
-
-# COPY solana-run.sh /usr/bin/solana-run.sh
-# ENTRYPOINT [ "/usr/bin/solana-run.sh" ]
+# # Update bashrc
+# RUN echo 'PATH=$PATH:/$PATH:/opt/solana-${SOLANA_VERSION}/bin' >> ~/.bashrc
 
 # there can be only one CMD instruction
 CMD ["/bin/bash"]
