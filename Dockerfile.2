@@ -1,0 +1,34 @@
+# Use the official Rust image as a parent image
+FROM rust:1.57.0
+
+# Set environment variables
+ENV SOLANA_VERSION="1.8.0"
+ENV PATH="/root/.local/share/solana/install/active_release/bin:$PATH"
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+  cmake \
+  libssl-dev \
+  pkg-config \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Solana
+# RUN curl -sSf https://release.solana.com/v${SOLANA_VERSION}/install | sh -s -- --target ~/solana/ --no-modify-path
+RUN curl -sSf https://release.solana.com/v${SOLANA_VERSION}/install | sh -s -- --target ~/solana/ --no-modify-path
+
+
+# Install Anchor
+RUN git clone https://github.com/project-serum/anchor.git \
+  && cd anchor/cli \
+  && cargo build --release \
+  && cargo install --path=. --force
+
+# Set up new project script
+COPY new_project.sh /usr/local/bin/new_project
+RUN chmod +x /usr/local/bin/new_project
+
+# Set working directory
+WORKDIR /workspace
+
+# Set up entrypoint
+ENTRYPOINT ["bash"]
