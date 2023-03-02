@@ -25,6 +25,6 @@ jobs:
       with:
         context: .
         push: true
-        tags: hieuphq/sol-anchor:v0.1
+        tags: hieuphq/sol-anchor:v0.2
 
         
