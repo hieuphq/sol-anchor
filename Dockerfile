@@ -41,22 +41,6 @@ ARG ANCHOR_VERSION=0.26.0
 RUN . ~/.cargo/env && echo $PATH && \
     cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
 RUN . ~/.cargo/env && echo $PATH && avm install ${ANCHOR_VERSION} && avm use ${ANCHOR_VERSION}
-# avm use ${ANCHOR_VERSION}
-
-
-# ARG ANCHOR_VERSION=0.26.0
-# RUN . ~/.cargo/env && echo $PATH && \
-#     cargo install --git https://github.com/coral-xyz/anchor --tag v${ANCHOR_VERSION} anchor-cli --locked
-
-
-# RUN git clone --branch v${ANCHOR_VERSION} https://github.com/project-serum/anchor.git && \
-#     cd anchor/cli && \
-#     cargo install --path . --locked --force --features="no-self-update"
-
-# ENV PATH=/opt/anchor/target/release:/opt/solana-${SOLANA_VERSION}/bin:$PATH
-
-# # Update bashrc
-# RUN echo 'PATH=$PATH:/$PATH:/opt/solana-${SOLANA_VERSION}/bin' >> ~/.bashrc
 
 # there can be only one CMD instruction
 CMD ["/bin/bash"]
